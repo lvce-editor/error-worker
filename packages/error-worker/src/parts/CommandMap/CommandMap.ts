@@ -1,5 +1,8 @@
+import * as Ajax from '../Ajax/Ajax.ts'
 import * as Terminate from '../Terminate/Terminate.ts'
 
 export const commandMap = {
-  'TextSearch.terminate': Terminate.terminate,
+  'Errors.getJson': Ajax.getJson,
+  'Errors.getText': Ajax.getText,
+  'Errors.terminate': Terminate.terminate,
 }
