@@ -1,5 +1,5 @@
-import * as Assert from '../Assert/Assert.ts'
 // @ts-nocheck
+import * as Assert from '../Assert/Assert.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 const RE_AT = /^\s+at/
