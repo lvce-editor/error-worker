@@ -1,6 +1,6 @@
 // @ts-nocheck
-import * as SplitLines from '../SplitLines/SplitLines.ts'
 import * as Assert from '../Assert/Assert.ts'
+import * as SplitLines from '../SplitLines/SplitLines.ts'
 
 const RE_AT = /^\s+at/
 const RE_AT_PROMISE_INDEX = /^\s*at async Promise.all \(index \d+\)$/

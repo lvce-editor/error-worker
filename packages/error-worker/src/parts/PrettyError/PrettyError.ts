@@ -1,27 +1,16 @@
-// @ts-nocheck
 import * as Ajax from '../Ajax/Ajax.ts'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as CodeFrameColumns from '../CodeFrameColumns/CodeFrameColumns.ts'
+import { getErrorMessage } from '../GetErrorMessage/GetErrorMessage.ts'
+import { getFile } from '../GetFile/GetFile.ts'
 import * as GetSourceMapMatch from '../GetSourceMapMatch/GetSourceMapMatch.ts'
 import * as IsActualSourceFile from '../IsActualSourceFile/IsActualSourceFile.ts'
+import * as IsFirefox from '../IsFirefox/IsFirefox.ts'
 import * as JoinLines from '../JoinLines/JoinLines.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as SourceMap from '../SourceMap/SourceMap.ts'
-import * as IsFirefox from '../IsFirefox/IsFirefox.ts'
 
-const getErrorMessage = (error) => {
-  if (!error) {
-    return `Error: ${error}`
-  }
-  let message = error.message
-  while (error.cause) {
-    error = error.cause
-    message += `: ${error}`
-  }
-  return message
-}
-
-const prepareErrorMessageWithCodeFrame = (error) => {
+const prepareErrorMessageWithCodeFrame = (error: any) => {
   if (!error) {
     return {
       message: error,
@@ -57,32 +46,18 @@ const RE_PATH_1 = /\((.*):(\d+):(\d+)\)$/
 const RE_PATH_2 = /at (.*):(\d+):(\d+)$/
 const RE_PATH_3 = /@(.*):(\d+):(\d+)$/ // Firefox
 
-/**
- *
- * @param {readonly string[]} lines
- * @returns
- */
-const getFile = (lines) => {
-  for (const line of lines) {
-    if (RE_PATH_1.test(line) || RE_PATH_2.test(line) || RE_PATH_3.test(line)) {
-      return line
-    }
-  }
-  return ''
-}
-
-const getSourceMapAbsolutePath = (file, relativePath) => {
+const getSourceMapAbsolutePath = (file: string, relativePath: string) => {
   const folder = file.slice(0, file.lastIndexOf('/'))
   const absolutePath = folder + '/' + relativePath
   return absolutePath
 }
 
-const toAbsoluteUrl = (file, relativePath) => {
+const toAbsoluteUrl = (file: string, relativePath: string) => {
   const url = new URL(relativePath, file)
   return url.href
 }
 
-const prepareErrorMessageWithoutCodeFrame = async (error) => {
+const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
   try {
     const lines = CleanStack.cleanStack(error.stack)
     const file = getFile(lines)
@@ -150,7 +125,7 @@ const prepareErrorMessageWithoutCodeFrame = async (error) => {
   }
 }
 
-export const prepare = async (error) => {
+export const prepare = async (error: any) => {
   if (error && error.message && error.codeFrame) {
     return prepareErrorMessageWithCodeFrame(error)
   }
@@ -160,7 +135,7 @@ export const prepare = async (error) => {
   return error
 }
 
-export const print = (error, prefix = '') => {
+export const print = (error: any, prefix = '') => {
   if (IsFirefox.isFirefox) {
     // Firefox does not support printing codeframe with error stack
     if (error && error._error) {
@@ -193,7 +168,7 @@ export const print = (error, prefix = '') => {
   Logger.error(`${prefix}${error}`)
 }
 
-export const getMessage = (error) => {
+export const getMessage = (error: any) => {
   if (error && error.type && error.message) {
     return `${error.type}: ${error.message}`
   }
