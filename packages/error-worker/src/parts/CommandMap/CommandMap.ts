@@ -1,6 +1,6 @@
 import * as Ajax from '../Ajax/Ajax.ts'
-import * as Terminate from '../Terminate/Terminate.ts'
 import * as PrettyError from '../PrettyError/PrettyError.ts'
+import * as Terminate from '../Terminate/Terminate.ts'
 
 export const commandMap = {
   'Errors.getJson': Ajax.getJson,
