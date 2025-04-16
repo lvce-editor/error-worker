@@ -6,13 +6,13 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-jest.unstable_mockModule('../src/parts/Logger/Logger.js', () => {
+jest.unstable_mockModule('../src/parts/Logger/Logger.ts', () => {
   return {
     warn: jest.fn(() => {}),
   }
 })
 
-jest.unstable_mockModule('../src/parts/Ajax/Ajax.js', () => {
+jest.unstable_mockModule('../src/parts/Ajax/Ajax.ts', () => {
   return {
     getText: jest.fn(() => {
       throw new Error('not implemented')
@@ -23,7 +23,7 @@ jest.unstable_mockModule('../src/parts/Ajax/Ajax.js', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/SourceMap/SourceMap.js', () => {
+jest.unstable_mockModule('../src/parts/SourceMap/SourceMap.ts', () => {
   return {
     getOriginalPosition: jest.fn(() => {
       throw new Error('not implemented')
@@ -31,10 +31,10 @@ jest.unstable_mockModule('../src/parts/SourceMap/SourceMap.js', () => {
   }
 })
 
-const PrettyError = await import('../src/parts/PrettyError/PrettyError.js')
-const Ajax = await import('../src/parts/Ajax/Ajax.js')
-const SourceMap = await import('../src/parts/SourceMap/SourceMap.js')
-const Logger = await import('../src/parts/Logger/Logger.js')
+const PrettyError = await import('../src/parts/PrettyError/PrettyError.ts')
+const Ajax = await import('../src/parts/Ajax/Ajax.ts')
+const SourceMap = await import('../src/parts/SourceMap/SourceMap.ts')
+const Logger = await import('../src/parts/Logger/Logger.ts')
 
 test('prepare - fetch codeFrame', async () => {
   // @ts-ignore
