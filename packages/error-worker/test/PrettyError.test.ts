@@ -1327,3 +1327,43 @@ const constructError = (message, type, name) => {
   expect(Ajax.getText).toHaveBeenCalledTimes(1)
   expect(Ajax.getText).toHaveBeenCalledWith('http://localhost:3000/packages/renderer-worker/src/parts/RestoreJsonRpcError/RestoreJsonRpcError.js')
 })
+
+test('prepare - command error', async () => {
+  const error = {
+    message: 'Failed to execute command: command xyz.sampleCommand not found',
+    stack: `VError: Failed to execute command: command xyz.sampleCommand not found
+VError: Failed to execute command: command xyz.sampleCommand not found
+    at executeCommand (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:711:13)
+    at execute (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1993:10)
+    at getResponse (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1885:115)
+    at handleJsonRpcMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1939:30)
+    at IpcChildWithModuleWorkerAndMessagePort.handleMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:2027:10)
+    at MessagePort.handleMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1166:10)
+    at restoreJsonRpcError (http://localhost:3000/static/js/lvce-editor-json-rpc.js:195:45)
+    at unwrapJsonRpcResult (http://localhost:3000/static/js/lvce-editor-json-rpc.js:239:27)
+    at Module.invoke (http://localhost:3000/static/js/lvce-editor-json-rpc.js:365:18)
+    at async Module.handleJsonRpcMessage (http://localhost:3000/packages/renderer-worker/src/parts/HandleJsonRpcMessage/HandleJsonRpcMessage.js:9:24)`,
+    name: 'Error',
+  }
+  // @ts-ignore
+  Ajax.getText.mockImplementation(() => {
+    return ''
+  })
+  const prettyError = await PrettyError.prepare(error)
+  expect(prettyError).toEqual({
+    _error: expect.anything(),
+    message: 'Failed to execute command: command xyz.sampleCommand not found',
+    stack: `    at executeCommand (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:711:13)
+    at execute (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1993:10)
+    at handleJsonRpcMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1939:30)
+    at IpcChildWithModuleWorkerAndMessagePort.handleMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:2027:10)
+    at MessagePort.handleMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1166:10)
+    at invoke (http://localhost:3000/static/js/lvce-editor-json-rpc.js:365:18)
+    at async handleJsonRpcMessage (http://localhost:3000/packages/renderer-worker/src/parts/HandleJsonRpcMessage/HandleJsonRpcMessage.js:9:24)`,
+    type: 'Error',
+    codeFrame: '',
+  })
+  expect(Logger.warn).not.toHaveBeenCalled()
+  expect(Ajax.getText).toHaveBeenCalledTimes(1)
+  expect(Ajax.getText).toHaveBeenCalledWith('http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js')
+})

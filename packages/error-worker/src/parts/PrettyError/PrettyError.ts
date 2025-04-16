@@ -57,6 +57,14 @@ const toAbsoluteUrl = (file: string, relativePath: string) => {
   return url.href
 }
 
+const getType = (error: any): string => {
+  const constructorName = error.constructor.name
+  if (constructorName === 'Object') {
+    return 'Error'
+  }
+  return constructorName
+}
+
 const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
   try {
     const lines = CleanStack.cleanStack(error.stack)
@@ -116,7 +124,7 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
       message,
       codeFrame,
       stack: relevantStack,
-      type: error.constructor.name,
+      type: getType(error),
       _error: error,
     }
   } catch (otherError) {
