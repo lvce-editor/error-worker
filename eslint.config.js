@@ -11,6 +11,7 @@ export default [
       'unicorn/numeric-separators-style': 'off',
       'no-console': 'off',
       'no-useless-escape': 'off',
+      'unicorn/error-message': 'off',
     },
   },
 ]
