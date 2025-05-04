@@ -22,7 +22,7 @@ jest.unstable_mockModule('@lvce-editor/rpc', () => {
 })
 
 const Listen = await import('../src/parts/Listen/Listen.ts')
-const RpcRegistry = await import('../src/parts/RpcRegistry/RpcRegistry.ts')
+const RpcRegistry = await import('@lvce-editor/rpc-registry')
 
 test('listen - creates rpc client and sets it', async () => {
   // @ts-ignore
