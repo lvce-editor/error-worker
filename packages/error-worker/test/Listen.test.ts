@@ -1,5 +1,6 @@
 import { expect, jest, test, beforeEach } from '@jest/globals'
 import * as RpcId from '../src/parts/RpcId/RpcId.ts'
+import * as ParentRpc from '../src/parts/ParentRpc/ParentRpc.ts'
 
 const mockRpc = {
   invoke: jest.fn(),
@@ -22,7 +23,7 @@ jest.unstable_mockModule('@lvce-editor/rpc', () => {
 })
 
 const Listen = await import('../src/parts/Listen/Listen.ts')
-const RpcRegistry = await import('../src/parts/RpcRegistry/RpcRegistry.ts')
+const RpcRegistry = await import('@lvce-editor/rpc-registry')
 
 test('listen - creates rpc client and sets it', async () => {
   // @ts-ignore
