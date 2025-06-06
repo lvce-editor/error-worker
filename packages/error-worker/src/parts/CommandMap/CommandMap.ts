@@ -6,8 +6,8 @@ import * as Terminate from '../Terminate/Terminate.ts'
 export const commandMap = {
   'Errors.getJson': Ajax.getJson,
   'Errors.getText': Ajax.getText,
-  'Errors.terminate': Terminate.terminate,
+  'Errors.handleMessagePort': HandleMessagePort.handleMessagePort2,
   'Errors.prepare': PrettyError.prepare,
   'Errors.print': PrettyError.print,
-  'Errors.handleMessagePort': HandleMessagePort.handleMessagePort2,
+  'Errors.terminate': Terminate.terminate,
 }
