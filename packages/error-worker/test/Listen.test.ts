@@ -18,6 +18,7 @@ jest.unstable_mockModule('@lvce-editor/rpc', () => {
     WebWorkerRpcClient: mockWebWorkerRpcClient,
     WebSocketRpcParent: mockWebWorkerRpcClient,
     MessagePortRpcParent: mockWebWorkerRpcClient,
+    PlainMessagePortRpcParent: mockWebWorkerRpcClient,
   }
 })
 
