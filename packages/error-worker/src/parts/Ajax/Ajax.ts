@@ -21,6 +21,9 @@ export const getJson = async (url: string, options = {}): Promise<any> => {
 
 export const getText = async (url: string, options = {}): Promise<string> => {
   try {
+    if (url.startsWith('node:')) {
+      return ''
+    }
     return await ky(url, options).text()
   } catch (error) {
     if (error && error instanceof TypeError && error.message === 'Failed to fetch') {
