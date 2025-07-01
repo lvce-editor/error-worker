@@ -12,6 +12,7 @@ export default [
       'no-console': 'off',
       'no-useless-escape': 'off',
       'unicorn/error-message': 'off',
+      'jest/no-restricted-jest-methods':'off'
     },
   },
 ]
