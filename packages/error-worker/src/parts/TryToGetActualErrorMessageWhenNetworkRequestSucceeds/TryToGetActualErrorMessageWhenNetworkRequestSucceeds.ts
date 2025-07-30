@@ -1,3 +1,4 @@
+import type { Dependency } from '../Dependency/Dependency.ts'
 import { BabelParseError } from '../BabelParseError/BabelParseError.ts'
 import * as BabelParser from '../BabelParser/BabelParser.ts'
 import { ContentSecurityPolicyError } from '../ContentSecurityPolicyError/ContentSecurityPolicyError.ts'
@@ -6,19 +7,10 @@ import { DependencyNotFoundError } from '../DependencyNotFoundError/DependencyNo
 import * as GetBabelAstDependencies from '../GetBabelAstDependencies/GetBabelAstDependencies.ts'
 import * as HttpStatusCode from '../HttpStatusCode/HttpStatusCode.ts'
 import * as IsBabelParseError from '../IsBabelParseError/IsBabelParseError.ts'
+import { isExternal } from '../IsExternal/IsExternal.ts'
 import * as Url from '../Url/Url.ts'
 
-const isExternal = (url: string): boolean => {
-  if (url.startsWith('/')) {
-    return false
-  }
-  if (url.startsWith(location.protocol)) {
-    return false
-  }
-  return true
-}
-
-const getErrorInDependencies = async (url: string, dependencies: any, seenUrls: any): Promise<void> => {
+const getErrorInDependencies = async (text: string, url: string, dependencies: readonly Dependency[], seenUrls: any): Promise<void> => {
   for (const dependency of dependencies) {
     const dependencyUrl = Url.getAbsoluteUrl(dependency.relativePath, url)
     if (isExternal(dependencyUrl) || seenUrls.includes(dependencyUrl)) {
@@ -34,7 +26,7 @@ const getErrorInDependencies = async (url: string, dependencies: any, seenUrls: 
     } else {
       switch (dependencyResponse.status) {
         case HttpStatusCode.NotFound:
-          throw new DependencyNotFoundError(dependency.code, dependency.start, dependency.end, dependency.relativePath, dependencyUrl, url)
+          throw new DependencyNotFoundError(text, dependency.start, dependency.end, dependency.relativePath, dependencyUrl, url)
         default:
           break
         // return `Failed to import ${url}: ${error}`
@@ -59,8 +51,8 @@ export const tryToGetActualErrorMessage = async (error: any, url: string, respon
     }
     throw error
   }
-  const dependencies = GetBabelAstDependencies.getBabelAstDependencies(text, ast)
-  await getErrorInDependencies(url, dependencies, seenUrls)
+  const dependencies = GetBabelAstDependencies.getBabelAstDependencies(ast)
+  await getErrorInDependencies(text, url, dependencies, seenUrls)
   if (ContentSecurityPolicyErrorState.hasRecentErrors()) {
     const recentError = ContentSecurityPolicyErrorState.getRecentError()
     // @ts-ignore

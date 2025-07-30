@@ -4,7 +4,7 @@ import * as Walk from '../src/parts/Walk/Walk.ts'
 
 test('walk - empty node', () => {
   const visitor = jest.fn()
-  Walk.walk(null, visitor)
+  Walk.walk(null, visitor, [])
   expect(visitor).not.toHaveBeenCalled()
 })
 
@@ -14,10 +14,10 @@ test('walk - array of nodes', () => {
     { type: BabelNodeType.Identifier, name: 'b' },
   ]
   const visitor = jest.fn()
-  Walk.walk(nodes, visitor)
+  Walk.walk(nodes, visitor, [])
   expect(visitor).toHaveBeenCalledTimes(2)
-  expect(visitor).toHaveBeenNthCalledWith(1, nodes[0])
-  expect(visitor).toHaveBeenNthCalledWith(2, nodes[1])
+  expect(visitor).toHaveBeenNthCalledWith(1, nodes[0], [])
+  expect(visitor).toHaveBeenNthCalledWith(2, nodes[1], [])
 })
 
 test('walk - file node', () => {
@@ -29,9 +29,9 @@ test('walk - file node', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.program)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.program, [])
 })
 
 test('walk - program node', () => {
@@ -40,9 +40,9 @@ test('walk - program node', () => {
     body: [{ type: BabelNodeType.Identifier, name: 'test' }],
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.body[0])
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.body[0], [])
 })
 
 test('walk - export named declaration', () => {
@@ -54,9 +54,9 @@ test('walk - export named declaration', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.declaration)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.declaration, [])
 })
 
 test('walk - variable declaration', () => {
@@ -65,9 +65,9 @@ test('walk - variable declaration', () => {
     declarations: [{ type: BabelNodeType.VariableDeclarator, id: { type: BabelNodeType.Identifier, name: 'x' } }],
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.declarations[0])
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.declarations[0], [])
 })
 
 test('walk - arrow function expression', () => {
@@ -79,9 +79,9 @@ test('walk - arrow function expression', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.body)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.body, [])
 })
 
 test('walk - expression statement', () => {
@@ -93,9 +93,9 @@ test('walk - expression statement', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.expression)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.expression, [])
 })
 
 test('walk - await expression', () => {
@@ -107,9 +107,9 @@ test('walk - await expression', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.argument)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.argument, [])
 })
 
 test('walk - call expression', () => {
@@ -121,9 +121,9 @@ test('walk - call expression', () => {
     },
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
-  expect(visitor).toHaveBeenCalledWith(node.callee)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
+  expect(visitor).toHaveBeenCalledWith(node.callee, [])
 })
 
 test('walk - unknown node type', () => {
@@ -131,6 +131,6 @@ test('walk - unknown node type', () => {
     type: 'UnknownType',
   }
   const visitor = jest.fn()
-  Walk.walk(node, visitor)
-  expect(visitor).toHaveBeenCalledWith(node)
+  Walk.walk(node, visitor, [])
+  expect(visitor).toHaveBeenCalledWith(node, [])
 })
