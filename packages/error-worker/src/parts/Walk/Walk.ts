@@ -1,6 +1,6 @@
 import * as BabelNodeType from '../BabelNodeType/BabelNodeType.ts'
 
-export const walk = (node:any, visitor:any): void => {
+export const walk = (node: any, visitor: any): void => {
   if (!node) {
     return
   }
