@@ -1,6 +1,11 @@
-import { expect, test } from '@jest/globals'
-import * as Main from '../src/parts/Main/Main.ts'
+import { test } from '@jest/globals'
+import { mockWorkerGlobalRpc } from '@lvce-editor/rpc'
+import { main } from '../src/parts/Main/Main.ts'
 
-test('main', () => {
-  expect(typeof Main.main).toBe('function')
+test('main', async () => {
+  const { start, dispose } = mockWorkerGlobalRpc()
+  const mainPromise = main()
+  start()
+  await mainPromise
+  dispose()
 })
