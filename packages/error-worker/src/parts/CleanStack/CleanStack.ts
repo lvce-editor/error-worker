@@ -16,6 +16,7 @@ const RE_GET_RESPONSE = /^\s*at getResponse/
 const RE_JSON_RPC_INVOKE = /^\s*at invoke .*JsonRpc\.js/
 const RE_ASSERT = /^\s*at .*\/Assert\.js/
 const RE_CONSTRUCT_ERROR = /^\s*at constructError /
+const RE_NODE_INTERNAL = /\(node:internal/
 
 const isInternalLine = (line) => {
   return RE_AT_PROMISE_INDEX.test(line)
@@ -41,7 +42,8 @@ const isApplicationUsefulLine = (line, index) => {
     RE_JSON_RPC_INVOKE.test(line) ||
     RE_UNWRAP_JSON_RPC_RESULT.test(line) ||
     RE_CONSTRUCT_ERROR.test(line) ||
-    RE_GET_RESPONSE.test(line)
+    RE_GET_RESPONSE.test(line) ||
+    RE_NODE_INTERNAL.test(line)
   ) {
     return false
   }
