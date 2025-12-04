@@ -1,6 +1,6 @@
 export interface LineAndColumn {
-  readonly line: number
   readonly column: number
+  readonly line: number
 }
 
 export const getLineAndColumn = (text: string, start: number, end: number): LineAndColumn => {
