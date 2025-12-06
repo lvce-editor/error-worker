@@ -13,11 +13,11 @@ import * as SourceMap from '../SourceMap/SourceMap.ts'
 const prepareErrorMessageWithCodeFrame = (error: any) => {
   if (!error) {
     return {
+      _error: error,
+      codeFrame: undefined,
       message: error,
       stack: undefined,
-      codeFrame: undefined,
       type: 'Error',
-      _error: error,
     }
   }
   const message = getErrorMessage(error)
@@ -25,20 +25,20 @@ const prepareErrorMessageWithCodeFrame = (error: any) => {
   const relevantStack = JoinLines.joinLines(lines)
   if (error.codeFrame) {
     return {
+      _error: error,
+      codeFrame: error.codeFrame,
       message,
       stack: relevantStack,
-      codeFrame: error.codeFrame,
       type: error.constructor.name,
-      _error: error,
     }
   }
   return {
+    _error: error,
+    category: error.category,
+    codeFrame: error.originalCodeFrame,
     message,
     stack: error.originalStack,
-    codeFrame: error.originalCodeFrame,
-    category: error.category,
     stderr: error.stderr,
-    _error: error,
   }
 }
 
@@ -89,43 +89,43 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
       const sourceMapUrl = sourceMapMatch[1]
       const sourceMapAbsolutePath = getSourceMapAbsolutePath(path, sourceMapUrl)
       const sourceMap = await Ajax.getJson(sourceMapAbsolutePath)
-      const { source, originalLine, originalColumn } = SourceMap.getOriginalPosition(sourceMap, parsedLine, parsedColumn)
+      const { originalColumn, originalLine, source } = SourceMap.getOriginalPosition(sourceMap, parsedLine, parsedColumn)
       const absoluteSourceUrl = toAbsoluteUrl(path, source)
       const originalSourceContent = await Ajax.getText(absoluteSourceUrl)
       const codeFrame = CodeFrameColumns.create(originalSourceContent, {
-        start: {
-          line: originalLine,
-          column: originalColumn,
-        },
         end: {
-          line: originalLine,
           column: originalColumn,
+          line: originalLine,
+        },
+        start: {
+          column: originalColumn,
+          line: originalLine,
         },
       })
       return {
-        message,
+        _error: error,
         codeFrame,
+        message,
         stack: relevantStack,
         type: error.constructor.name,
-        _error: error,
       }
     }
     const codeFrame = CodeFrameColumns.create(text, {
-      start: {
-        line: parsedLine,
-        column: parsedColumn,
-      },
       end: {
-        line: parsedLine,
         column: parsedColumn,
+        line: parsedLine,
+      },
+      start: {
+        column: parsedColumn,
+        line: parsedLine,
       },
     })
     return {
-      message,
+      _error: error,
       codeFrame,
+      message,
       stack: relevantStack,
       type: getType(error),
-      _error: error,
     }
   } catch (otherError) {
     Logger.warn(`ErrorHandling Error: ${otherError}`)

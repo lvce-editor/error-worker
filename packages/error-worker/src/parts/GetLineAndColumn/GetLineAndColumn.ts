@@ -14,7 +14,7 @@ export const getLineAndColumn = (text: string, start: number, end: number): Line
     }
   }
   return {
-    line,
     column,
+    line,
   }
 }

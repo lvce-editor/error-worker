@@ -7,11 +7,11 @@ export const visitNode = (node: any, dependencies: Dependency[]): void => {
     const relativePath = node.source.value
     const { start } = node.source
     const { end } = node.source
-    dependencies.push({ relativePath, start, end })
+    dependencies.push({ end, relativePath, start })
   }
   if (node && is(BabelNodeType.ImportExpression, node) && is(BabelNodeType.StringLiteral, node.source) && node.source.start && node.source.end) {
     const relativePath = node.source.value
-    const { start, end } = node.source
-    dependencies.push({ relativePath, start, end })
+    const { end, start } = node.source
+    dependencies.push({ end, relativePath, start })
   }
 }
