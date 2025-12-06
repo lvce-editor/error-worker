@@ -65,12 +65,12 @@ const getMarkerLines = (loc, source, opts) => {
     markerLines[startLine] = [startColumn, endColumn - startColumn]
   }
 
-  return { start, end, markerLines }
+  return { end, markerLines, start }
 }
 
 export const create = (rawLines, loc, opts = {}) => {
   const lines = rawLines.split(NEWLINE)
-  const { start, end, markerLines } = getMarkerLines(loc, lines, opts)
+  const { end, markerLines, start } = getMarkerLines(loc, lines, opts)
   const hasColumns = loc.start && typeof loc.start.column === 'number'
 
   const numberMaxWidth = String(end).length

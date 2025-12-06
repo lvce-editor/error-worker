@@ -14,10 +14,10 @@ jest.unstable_mockModule('../src/parts/Logger/Logger.ts', () => {
 
 jest.unstable_mockModule('../src/parts/Ajax/Ajax.ts', () => {
   return {
-    getText: jest.fn(() => {
+    getJson: jest.fn(() => {
       throw new Error('not implemented')
     }),
-    getJson: jest.fn(() => {
+    getText: jest.fn(() => {
       throw new Error('not implemented')
     }),
   }
@@ -66,7 +66,7 @@ test('prepare - fetch codeFrame', async () => {
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'Menu is not defined',
+    _error: error,
     codeFrame: `  2 |   const { menus } = state
   3 |   const menu = menus.at(-1)
 > 4 |   const newFocusedIndex = Menu.getIndexToFocusNext(menu)
@@ -74,13 +74,13 @@ test('prepare - fetch codeFrame', async () => {
   5 |   const newMenus = [
   6 |     ...menus.slice(0, -1),
   7 |     {`,
+    message: 'Menu is not defined',
     stack: `    at handleKeyArrowDownMenuOpen (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27)
     at ifElseFunction (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14)
     at TitleBarMenuBar/lazy/handleKeyArrowDown [as TitleBarMenuBar.handleKeyArrowDown] (test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30)
     at async handleKeyBinding [as KeyBindings.handleKeyBinding] (test:///packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3)
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'ReferenceError',
-    _error: error,
   })
 })
 
@@ -109,11 +109,11 @@ const execute = () => {
     switch (url) {
       case 'test://packages/renderer-worker/dist/rendererWorkerMain.js.map':
         return {
-          version: 3,
-          sources: [],
-          sourcesContent: [],
           mappings: ';;;',
           names: [],
+          sources: [],
+          sourcesContent: [],
+          version: 3,
         }
       default:
         throw new Error(`unsupported url ${url}`)
@@ -122,9 +122,9 @@ const execute = () => {
   // @ts-ignore
   SourceMap.getOriginalPosition.mockImplementation(() => {
     return {
-      source: '../src/parts/Command/Command.js',
-      originalLine: 4,
       originalColumn: 13,
+      originalLine: 4,
+      source: '../src/parts/Command/Command.js',
     }
   })
   const error = new Error('Command did not register: "ElectronWindow.openNew"')
@@ -135,19 +135,19 @@ const execute = () => {
   at async handleMessageFromRendererProcess (test://packages/renderer-worker/dist/rendererWorkerMain.js:897:7)`
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'Command did not register: "ElectronWindow.openNew"',
+    _error: error,
     codeFrame: `  2 |
   3 | const execute = () => {
 > 4 |   throw new Error(\`Command did not register \"\${command}\"\`)
     |             ^
   5 | }
   6 |`,
+    message: 'Command did not register: "ElectronWindow.openNew"',
     stack: `  at test://packages/renderer-worker/dist/rendererWorkerMain.js:353:17
   at async selectIndexNone2 (test://packages/renderer-worker/dist/rendererWorkerMain.js:32978:7)
   at async TitleBarMenuBar/lazy/handleMenuMouseDown (test://packages/renderer-worker/dist/rendererWorkerMain.js:7329:28)
   at async handleMessageFromRendererProcess (test://packages/renderer-worker/dist/rendererWorkerMain.js:897:7)`,
     type: 'Error',
-    _error: error,
   })
 })
 
@@ -215,7 +215,7 @@ Object.handleKeyBinding@test:///packages/renderer-worker/src/parts/KeyBindings/K
 handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3`
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'Menu is not defined',
+    _error: error,
     codeFrame: `  2 |   const { menus } = state
   3 |   const menu = menus.at(-1)
 > 4 |   const newFocusedIndex = Menu.getIndexToFocusNext(menu)
@@ -223,13 +223,13 @@ handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/Rend
   5 |   const newMenus = [
   6 |     ...menus.slice(0, -1),
   7 |     {`,
+    message: 'Menu is not defined',
     stack: `handleKeyArrowDownMenuOpen@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27
 ifElseFunction@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14
 TitleBarMenuBar/lazy/handleKeyArrowDown@test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30
 Object.handleKeyBinding@test:///packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3
 handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3`,
     type: 'ReferenceError',
-    _error: error,
   })
 })
 
@@ -300,7 +300,7 @@ export const getBulkReplacementEdits = (matches) => {
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'Maximum call stack size exceeded',
+    _error: error,
     codeFrame: `  20 |     }
   21 |   }
 > 22 |   ranges.push(currentRanges.length, ...currentRanges)
@@ -308,13 +308,13 @@ export const getBulkReplacementEdits = (matches) => {
   23 |   return {
   24 |     files,
   25 |     ranges: ranges.slice(1),`,
+    message: 'Maximum call stack size exceeded',
     stack: `    at getBulkReplacementEdits (test:///packages/renderer-worker/src/parts/GetBulkReplacementEdits/GetBulkReplacementEdits.js:22:10)
     at actuallyReplaceAll (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchReplaceAll.js:5:53)
     at replaceAll (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchReplaceAll.js:17:9)
     at async Search/lazy/replaceAll (test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:107:24)
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'RangeError',
-    _error: error,
   })
 })
 
@@ -338,7 +338,7 @@ export const textSearch = (scheme, root, query) => {
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'not implemented',
+    _error: error,
     codeFrame: `  2 |
   3 | export const textSearch = (scheme, root, query) => {
 > 4 |   throw new Error('not implemented')
@@ -346,13 +346,13 @@ export const textSearch = (scheme, root, query) => {
   5 | }
   6 |
   7 |`,
+    message: 'not implemented',
     stack: `    at textSearch (test:///packages/renderer-worker/src/parts/TextSearch/TextSearchHtml.js:4:9)
     at textSearch (test:///packages/renderer-worker/src/parts/TextSearch/TextSearch.js:24:34)
     at async handleUpdate (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchHandleUpdate.js:43:21)
     at async handleInput (test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:51:24)
     at async handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'Error',
-    _error: error,
   })
 })
 
@@ -385,6 +385,14 @@ test('prepare - VError with code frame', async () => {
   })
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
+    _error: error,
+    codeFrame: `  30 |
+  31 | export const getColorThemeJson = async (colorThemeId) => {
+> 32 |   Assert.string(colorThemeId)
+     |          ^
+  33 |   const extensions = await ExtensionManagement.getExtensions()
+  34 |   const colorThemePath = await getColorThemePath(extensions, colorThemeId)
+  35 |   if (!colorThemePath) {`,
     message: 'Failed to apply color theme "undefined": expected value to be of type string',
     stack: `    at ExtensionHost.getColorThemeJson (file:///test/packages/shared-process/src/parts/ExtensionManagement/ExtensionManagementColorTheme.js:32:10)
     at executeCommandAsync (file:///test/packages/shared-process/src/parts/Command/Command.js:68:33)
@@ -395,15 +403,7 @@ test('prepare - VError with code frame', async () => {
     at async hydrate (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:121:5)
     at async startup (http://localhost:3000/packages/renderer-worker/src/parts/Workbench/Workbench.js:73:3)
     at async main (http://localhost:3000/packages/renderer-worker/src/rendererWorkerMain.js:7:3)`,
-    codeFrame: `  30 |
-  31 | export const getColorThemeJson = async (colorThemeId) => {
-> 32 |   Assert.string(colorThemeId)
-     |          ^
-  33 |   const extensions = await ExtensionManagement.getExtensions()
-  34 |   const colorThemePath = await getColorThemePath(extensions, colorThemeId)
-  35 |   if (!colorThemePath) {`,
     type: 'VError',
-    _error: error,
   })
   expect(Ajax.getText).not.toHaveBeenCalled()
 })
@@ -554,11 +554,7 @@ export const hydrate = async () => {
   })
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'Failed to apply color theme "undefined": AssertionError: expected value to be of type string',
-    stack: `    at applyColorTheme (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:82:12)
-    at hydrate (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:123:11)
-    at startup (http://localhost:3000/packages/renderer-worker/src/parts/Workbench/Workbench.js:73:20)
-    at async main (http://localhost:3000/packages/renderer-worker/src/rendererWorkerMain.js:7:3)\"`,
+    _error: error,
     codeFrame: `  80 | const applyColorTheme = async (colorThemeId) => {
   81 |   try {
 > 82 |     Assert.string(colorThemeId)
@@ -566,8 +562,12 @@ export const hydrate = async () => {
   83 |     state.colorTheme = colorThemeId
   84 |     const colorThemeJson = await getColorThemeJson(colorThemeId)
   85 |     const colorThemeCss = await getColorThemeCss(colorThemeId, colorThemeJson)`,
+    message: 'Failed to apply color theme "undefined": AssertionError: expected value to be of type string',
+    stack: `    at applyColorTheme (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:82:12)
+    at hydrate (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:123:11)
+    at startup (http://localhost:3000/packages/renderer-worker/src/parts/Workbench/Workbench.js:73:20)
+    at async main (http://localhost:3000/packages/renderer-worker/src/rendererWorkerMain.js:7:3)\"`,
     type: 'VError',
-    _error: error,
   })
   expect(Ajax.getText).toHaveBeenCalledTimes(1)
   expect(Ajax.getText).toHaveBeenCalledWith('http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js')
@@ -676,13 +676,7 @@ export const insertLineBreak = async (editor) => {
   })
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'increaseIndentRegex.text is not a function',
-    stack: `    at shouldIncreaseIndent (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:24:30)
-    at getChanges (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:53:11)
-    at insertLineBreak (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:86:19)
-    at async EditorText/lazy/insertLineBreak (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:108:24)
-    at async handleKeyBinding (http://localhost:3000/packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3)
-    at async handleMessageFromRendererProcess (http://localhost:3000/packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
+    _error: error,
     codeFrame: `  22 |     return false
   23 |   }
 > 24 |   return increaseIndentRegex.text(before)
@@ -690,8 +684,14 @@ export const insertLineBreak = async (editor) => {
   25 | }
   26 |
   27 | const getChanges = (lines, selections, languageConfiguration) => {`,
+    message: 'increaseIndentRegex.text is not a function',
+    stack: `    at shouldIncreaseIndent (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:24:30)
+    at getChanges (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:53:11)
+    at insertLineBreak (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:86:19)
+    at async EditorText/lazy/insertLineBreak (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:108:24)
+    at async handleKeyBinding (http://localhost:3000/packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3)
+    at async handleMessageFromRendererProcess (http://localhost:3000/packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'TypeError',
-    _error: error,
   })
 })
 
@@ -786,10 +786,7 @@ export const handleMenuMouseOver = async (state, level, index) => {
   })
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
-    message: 'expected value to be of type number',
-    stack: `    at handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleMenuMouseOver.js:9:10)
-    at TitleBarMenuBar/lazy/handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:108:30)
-    at async handleMessageFromRendererProcess (http://localhost:3000/packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
+    _error: error,
     codeFrame: `   7 |   Assert.object(state)
    8 |   Assert.number(level)
 >  9 |   Assert.number(index)
@@ -797,8 +794,11 @@ export const handleMenuMouseOver = async (state, level, index) => {
   10 |   const { menus } = state
   11 |   const menu = menus[level]
   12 |   const { items, focusedIndex, y, x } = menu`,
+    message: 'expected value to be of type number',
+    stack: `    at handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleMenuMouseOver.js:9:10)
+    at TitleBarMenuBar/lazy/handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:108:30)
+    at async handleMessageFromRendererProcess (http://localhost:3000/packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'AssertionError',
-    _error: error,
   })
 })
 
@@ -1177,6 +1177,14 @@ export const setBounds = (id, left, top, width, height) => {
   })
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
+    _error: error,
+    codeFrame: `  21 |     state.instances[id].state.$Viewlet.remove()
+  22 |   }
+> 23 |   const instanceState = module.create()
+     |                                ^
+  24 |   if (module.attachEvents) {
+  25 |     module.attachEvents(instanceState)
+  26 |   }`,
     message: "Cannot read properties of undefined (reading 'create')",
     stack: `    at create (http://localhost:3000/packages/renderer-process/src/parts/Viewlet/Viewlet.js:23:32)
     at Viewlet.sendMultiple (http://localhost:3000/packages/renderer-process/src/parts/Viewlet/Viewlet.js:132:9)
@@ -1185,15 +1193,7 @@ export const setBounds = (id, left, top, width, height) => {
     at async loadSideBarIfVisible (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:88:5)
     at async startup (http://localhost:3000/packages/renderer-worker/src/parts/Workbench/Workbench.js:116:3)
     at async main (http://localhost:3000/packages/renderer-worker/src/rendererWorkerMain.js:7:3)`,
-    codeFrame: `  21 |     state.instances[id].state.$Viewlet.remove()
-  22 |   }
-> 23 |   const instanceState = module.create()
-     |                                ^
-  24 |   if (module.attachEvents) {
-  25 |     module.attachEvents(instanceState)
-  26 |   }`,
     type: 'TypeError',
-    _error: error,
   })
 })
 
@@ -1331,6 +1331,7 @@ const constructError = (message, type, name) => {
 test('prepare - command error', async () => {
   const error = {
     message: 'Failed to execute command: command xyz.sampleCommand not found',
+    name: 'Error',
     stack: `VError: Failed to execute command: command xyz.sampleCommand not found
 VError: Failed to execute command: command xyz.sampleCommand not found
     at executeCommand (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:711:13)
@@ -1343,7 +1344,6 @@ VError: Failed to execute command: command xyz.sampleCommand not found
     at unwrapJsonRpcResult (http://localhost:3000/static/js/lvce-editor-json-rpc.js:239:27)
     at Module.invoke (http://localhost:3000/static/js/lvce-editor-json-rpc.js:365:18)
     at async Module.handleJsonRpcMessage (http://localhost:3000/packages/renderer-worker/src/parts/HandleJsonRpcMessage/HandleJsonRpcMessage.js:9:24)`,
-    name: 'Error',
   }
   // @ts-ignore
   Ajax.getText.mockImplementation(() => {
@@ -1352,6 +1352,7 @@ VError: Failed to execute command: command xyz.sampleCommand not found
   const prettyError = await PrettyError.prepare(error)
   expect(prettyError).toEqual({
     _error: expect.anything(),
+    codeFrame: '',
     message: 'Failed to execute command: command xyz.sampleCommand not found',
     stack: `    at executeCommand (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:711:13)
     at execute (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1993:10)
@@ -1361,7 +1362,6 @@ VError: Failed to execute command: command xyz.sampleCommand not found
     at invoke (http://localhost:3000/static/js/lvce-editor-json-rpc.js:365:18)
     at async handleJsonRpcMessage (http://localhost:3000/packages/renderer-worker/src/parts/HandleJsonRpcMessage/HandleJsonRpcMessage.js:9:24)`,
     type: 'Error',
-    codeFrame: '',
   })
   expect(Logger.warn).not.toHaveBeenCalled()
   expect(Ajax.getText).toHaveBeenCalledTimes(1)
