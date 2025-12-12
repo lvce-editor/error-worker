@@ -46,15 +46,15 @@
     "@babel/parser": "^8.0.0-beta.1",
     "@babel/types": "^8.0.0-beta.1",
     "@jest/globals": "^30.2.0",
-    "@lvce-editor/assert": "^1.4.0",
+    "@lvce-editor/assert": "^1.5.1",
     "@lvce-editor/i18n": "^2.1.0",
     "@lvce-editor/list": "^1.7.0",
     "@lvce-editor/rpc": "^4.20.0",
-    "@lvce-editor/rpc-registry": "^4.9.0",
+    "@lvce-editor/rpc-registry": "^5.3.0",
     "@lvce-editor/verror": "^1.7.0",
     "@lvce-editor/virtual-dom-worker": "^4.0.0",
     "jest": "^30.2.0",
-    "ky": "^1.14.0",
-    "ts-jest": "^29.4.5"
+    "ky": "^1.14.1",
+    "ts-jest": "^29.4.6"
   }
 }
