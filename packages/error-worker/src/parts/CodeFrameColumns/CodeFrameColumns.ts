@@ -82,6 +82,7 @@ export const create = (rawLines, loc, opts = {}) => {
       const number = start + 1 + index
       const paddedNumber = ` ${number}`.slice(-numberMaxWidth)
       const gutter = ` ${paddedNumber} |`
+      const lineSuffix = line.length > 0 ? ` ${line}` : ''
       const hasMarker = markerLines[number]
       const lastMarkerLine = !markerLines[number + 1]
       if (hasMarker) {
@@ -96,9 +97,9 @@ export const create = (rawLines, loc, opts = {}) => {
             markerLine += ' ' + opts.message
           }
         }
-        return ['>', gutter, line.length > 0 ? ` ${line}` : '', markerLine].join('')
+        return ['>', gutter, lineSuffix, markerLine].join('')
       }
-      return ` ${gutter}${line.length > 0 ? ` ${line}` : ''}`
+      return ` ${gutter}${lineSuffix}`
     })
     .join(Character.NewLine)
 

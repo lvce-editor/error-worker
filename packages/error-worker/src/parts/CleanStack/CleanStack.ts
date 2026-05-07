@@ -32,22 +32,16 @@ const isNormalStackLine = (line) => {
 
 const isApplicationUsefulLine = (line, index) => {
   if (index === 0) {
-    if (RE_ASSERT.test(line)) {
-      return false
-    }
-    return true
+    return !RE_ASSERT.test(line)
   }
-  if (
+  return !(
     RE_RESTORE_JSON_RPC_ERROR.test(line) ||
     RE_JSON_RPC_INVOKE.test(line) ||
     RE_UNWRAP_JSON_RPC_RESULT.test(line) ||
     RE_CONSTRUCT_ERROR.test(line) ||
     RE_GET_RESPONSE.test(line) ||
     RE_NODE_INTERNAL.test(line)
-  ) {
-    return false
-  }
-  return true
+  )
 }
 
 const cleanLine = (line) => {
