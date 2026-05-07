@@ -3,59 +3,69 @@ import * as IsEmptyString from '../IsEmptyString/IsEmptyString.ts'
 import { VError } from '../VError/VError.ts'
 import * as Vlq from '../Vlq/Vlq.ts'
 
+interface MappingState {
+  originalColumn: number
+  originalLine: number
+  originalSourceFileIndex: number
+}
+
+const applyChunk = (state: MappingState, chunk: string): number => {
+  const decodedChunk = Vlq.decode(chunk)
+  state.originalSourceFileIndex += decodedChunk[1]
+  state.originalLine += decodedChunk[2]
+  state.originalColumn += decodedChunk[3]
+  return decodedChunk[0]
+}
+
+const getOriginalPositionForLine = (lineMappings: string, column: number, state: MappingState) => {
+  let currentColumn = 0
+  const chunks = lineMappings.split(',')
+  for (const chunk of chunks) {
+    if (IsEmptyString.isEmptyString(chunk)) {
+      continue
+    }
+    currentColumn += applyChunk(state, chunk)
+    if (currentColumn >= column) {
+      return {
+        originalColumn: state.originalColumn,
+        originalLine: state.originalLine + 1,
+        originalSourceFileIndex: state.originalSourceFileIndex,
+      }
+    }
+  }
+  throw new Error('no mapping found')
+}
+
+const applyLineMappings = (lineMappings: string, state: MappingState): void => {
+  if (IsEmptyString.isEmptyString(lineMappings)) {
+    return
+  }
+  const chunks = lineMappings.split(',')
+  for (const chunk of chunks) {
+    applyChunk(state, chunk)
+  }
+}
+
 const getColumnMapping = (mappings: string, line: number, column: number) => {
   Assert.string(mappings)
   Assert.number(line)
   Assert.number(column)
-  let currentColumn = 0
   let currentLine = 1
-  let originalSourceFileIndex = 0
-  let originalLine = 0
-  let originalColumn = 0
+  const state: MappingState = {
+    originalColumn: 0,
+    originalLine: 0,
+    originalSourceFileIndex: 0,
+  }
   let index = 0
 
   while (index !== -1) {
-    currentColumn = 0
     const newLineIndex = mappings.indexOf(';', index + 1)
     currentLine++
+    const lineMappings = mappings.slice(index + 1, newLineIndex)
     if (currentLine === line) {
-      const lineMapping = mappings.slice(index + 1, newLineIndex) + ','
-      index = -1
-      while (true) {
-        const newIndex = lineMapping.indexOf(',', index + 1)
-        if (newIndex === -1) {
-          throw new Error('no mapping found')
-        }
-        const chunk = lineMapping.slice(index + 1, newIndex)
-        const decodedChunk = Vlq.decode(chunk)
-        currentColumn += decodedChunk[0]
-        originalSourceFileIndex += decodedChunk[1]
-        originalLine += decodedChunk[2]
-        originalColumn += decodedChunk[3]
-        index = newIndex
-        if (currentColumn >= column) {
-          return {
-            originalColumn,
-            originalLine: originalLine + 1,
-            originalSourceFileIndex,
-          }
-        }
-      }
-    } else {
-      const lineMappings = mappings.slice(index + 1, newLineIndex)
-      if (IsEmptyString.isEmptyString(lineMappings)) {
-        index = newLineIndex
-        continue
-      }
-      const chunks = lineMappings.split(',')
-      for (const chunk of chunks) {
-        const decodedChunk = Vlq.decode(chunk)
-        currentColumn += decodedChunk[0]
-        originalSourceFileIndex += decodedChunk[1]
-        originalLine += decodedChunk[2]
-        originalColumn += decodedChunk[3]
-      }
+      return getOriginalPositionForLine(lineMappings, column, state)
     }
+    applyLineMappings(lineMappings, state)
     index = newLineIndex
   }
   throw new Error('no mapping found')

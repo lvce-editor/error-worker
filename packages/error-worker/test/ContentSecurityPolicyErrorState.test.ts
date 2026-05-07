@@ -20,7 +20,7 @@ test('hasRecentErrors - no errors', () => {
   expect(ContentSecurityPolicyErrorState.hasRecentErrors()).toBe(false)
 })
 
-test.skip('getRecentError', () => {
+test('getRecentError', () => {
   const error = {
     columnNumber: 11,
     lineNumber: 1,
