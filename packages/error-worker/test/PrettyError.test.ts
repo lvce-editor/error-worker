@@ -802,6 +802,56 @@ export const handleMenuMouseOver = async (state, level, index) => {
   })
 })
 
+test('prepare - AssertionError - ignored codeFrame stack lines', async () => {
+  const error = new AssertionError('expected selector to be visible .DialogContent >> .DialogInfoIcoan')
+  error.stack = `AssertionError: expected selector to be visible .DialogContent >> .DialogInfoIcoan
+    at Expect.checkSingleElementCondition (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:2391:13)
+    at async test (about.open.ts:13:3)
+    at async callFunction (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:6318:5)`
+  // @ts-ignore
+  Ajax.getText.mockImplementation((url) => {
+    switch (url) {
+      case 'about.open.ts':
+        return `export const name = 'about.open'
+
+export const test = async ({ Locator, expect }) => {
+  await Locator('.ActivityBarTop .IconButton').click()
+  await Locator('.MenuEntry').nth(2).click()
+  await expect(Locator('.Dialog')).toBeVisible()
+  await expect(Locator('.DialogContent')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  await expect(Locator('.DialogContent >> .DialogInfoIcoan')).toBeVisible()
+}
+`
+      default:
+        throw new Error(`unsupported url ${url}`)
+    }
+  })
+  const prettyError = await PrettyError.prepare(error, {
+    ignoredCodeFrameStackLines: ['testWorkerMain.js'],
+  })
+  expect(prettyError).toEqual({
+    _error: error,
+    codeFrame: `  11 |   await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+  12 |   await expect(Locator('.DialogContent >> .DialogInfoIcon')).toBeVisible()
+> 13 |   await expect(Locator('.DialogContent >> .DialogInfoIcoan')).toBeVisible()
+     |   ^
+  14 | }
+  15 |`,
+    message: 'expected selector to be visible .DialogContent >> .DialogInfoIcoan',
+    stack: `    at Expect.checkSingleElementCondition (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:2391:13)
+    at async test (about.open.ts:13:3)
+    at async callFunction (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:6318:5)`,
+    type: 'AssertionError',
+  })
+  expect(Ajax.getText).toHaveBeenCalledTimes(1)
+  expect(Ajax.getText).toHaveBeenCalledWith('about.open.ts')
+})
+
 test('prepare - Viewlet error', async () => {
   const error = new TypeError("Cannot read properties of undefined (reading 'create')")
   error.stack = `TypeError: Cannot read properties of undefined (reading 'create')
