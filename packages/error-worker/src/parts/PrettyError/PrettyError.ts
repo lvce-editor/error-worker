@@ -10,7 +10,7 @@ import * as JoinLines from '../JoinLines/JoinLines.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as SourceMap from '../SourceMap/SourceMap.ts'
 
-interface PrepareOptions {
+export interface PrepareOptions {
   readonly ignoredCodeFrameStackLines?: readonly string[]
 }
 
