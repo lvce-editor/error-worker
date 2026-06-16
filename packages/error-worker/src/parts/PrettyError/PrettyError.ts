@@ -10,6 +10,10 @@ import * as JoinLines from '../JoinLines/JoinLines.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as SourceMap from '../SourceMap/SourceMap.ts'
 
+export interface PrepareOptions {
+  readonly ignoredCodeFrameStackLines?: readonly string[]
+}
+
 const prepareErrorMessageWithCodeFrame = (error: any) => {
   if (!error) {
     return {
@@ -65,10 +69,15 @@ const getType = (error: any): string => {
   return constructorName
 }
 
-const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
+const getIgnoredCodeFrameStackLines = (options: PrepareOptions): readonly string[] => {
+  return options.ignoredCodeFrameStackLines || []
+}
+
+const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareOptions) => {
   try {
     const lines = CleanStack.cleanStack(error.stack)
-    const file = getFile(lines)
+    const ignoredStackLines = getIgnoredCodeFrameStackLines(options)
+    const file = getFile(lines, ignoredStackLines)
     let match = file.match(RE_PATH_1)
     match ||= file.match(RE_PATH_2)
     match ||= file.match(RE_PATH_3)
@@ -133,12 +142,12 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any) => {
   }
 }
 
-export const prepare = async (error: any) => {
+export const prepare = async (error: any, options: PrepareOptions = {}) => {
   if (error && error.message && error.codeFrame) {
     return prepareErrorMessageWithCodeFrame(error)
   }
   if (error && error.stack) {
-    return prepareErrorMessageWithoutCodeFrame(error)
+    return prepareErrorMessageWithoutCodeFrame(error, options)
   }
   return error
 }
