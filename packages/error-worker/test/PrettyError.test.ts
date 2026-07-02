@@ -9,6 +9,7 @@ beforeEach(() => {
 
 jest.unstable_mockModule('../src/parts/Logger/Logger.ts', () => {
   return {
+    error: jest.fn(() => {}),
     warn: jest.fn(() => {}),
   }
 })
@@ -36,6 +37,26 @@ const PrettyError = await import('../src/parts/PrettyError/PrettyError.ts')
 const Ajax = await import('../src/parts/Ajax/Ajax.ts')
 const SourceMap = await import('../src/parts/SourceMap/SourceMap.ts')
 const Logger = await import('../src/parts/Logger/Logger.ts')
+
+test('print - prepared message with type', () => {
+  PrettyError.print({
+    codeFrame: 'code frame',
+    message: 'TypeError: x is not a function',
+    stack: '    at fn (test.js:1:1)',
+    type: 'TypeError',
+  })
+  expect(Logger.error).toHaveBeenCalledTimes(1)
+  expect(Logger.error).toHaveBeenNthCalledWith(1, 'TypeError: x is not a function\n\ncode frame\n\n    at fn (test.js:1:1)')
+})
+
+test('getMessage - prepared message with type', () => {
+  expect(
+    PrettyError.getMessage({
+      message: 'TypeError: x is not a function',
+      type: 'TypeError',
+    }),
+  ).toBe('TypeError: x is not a function')
+})
 
 test('prepare - fetch codeFrame', async () => {
   // @ts-ignore
@@ -75,7 +96,7 @@ test('prepare - fetch codeFrame', async () => {
   5 |   const newMenus = [
   6 |     ...menus.slice(0, -1),
   7 |     {`,
-    message: 'Menu is not defined',
+    message: 'ReferenceError: Menu is not defined',
     stack: `    at handleKeyArrowDownMenuOpen (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27)
     at ifElseFunction (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14)
     at TitleBarMenuBar/lazy/handleKeyArrowDown [as TitleBarMenuBar.handleKeyArrowDown] (test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30)
@@ -143,7 +164,7 @@ const execute = () => {
     |             ^
   5 | }
   6 |`,
-    message: 'Command did not register: "ElectronWindow.openNew"',
+    message: 'Error: Command did not register: "ElectronWindow.openNew"',
     stack: `  at test://packages/renderer-worker/dist/rendererWorkerMain.js:353:17
   at async selectIndexNone2 (test://packages/renderer-worker/dist/rendererWorkerMain.js:32978:7)
   at async TitleBarMenuBar/lazy/handleMenuMouseDown (test://packages/renderer-worker/dist/rendererWorkerMain.js:7329:28)
@@ -224,7 +245,7 @@ handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/Rend
   5 |   const newMenus = [
   6 |     ...menus.slice(0, -1),
   7 |     {`,
-    message: 'Menu is not defined',
+    message: 'ReferenceError: Menu is not defined',
     stack: `handleKeyArrowDownMenuOpen@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27
 ifElseFunction@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14
 TitleBarMenuBar/lazy/handleKeyArrowDown@test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30
@@ -309,7 +330,7 @@ export const getBulkReplacementEdits = (matches) => {
   23 |   return {
   24 |     files,
   25 |     ranges: ranges.slice(1),`,
-    message: 'Maximum call stack size exceeded',
+    message: 'RangeError: Maximum call stack size exceeded',
     stack: `    at getBulkReplacementEdits (test:///packages/renderer-worker/src/parts/GetBulkReplacementEdits/GetBulkReplacementEdits.js:22:10)
     at actuallyReplaceAll (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchReplaceAll.js:5:53)
     at replaceAll (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchReplaceAll.js:17:9)
@@ -347,7 +368,7 @@ export const textSearch = (scheme, root, query) => {
   5 | }
   6 |
   7 |`,
-    message: 'not implemented',
+    message: 'Error: not implemented',
     stack: `    at textSearch (test:///packages/renderer-worker/src/parts/TextSearch/TextSearchHtml.js:4:9)
     at textSearch (test:///packages/renderer-worker/src/parts/TextSearch/TextSearch.js:24:34)
     at async handleUpdate (test:///packages/renderer-worker/src/parts/ViewletSearch/ViewletSearchHandleUpdate.js:43:21)
@@ -394,7 +415,7 @@ test('prepare - VError with code frame', async () => {
   33 |   const extensions = await ExtensionManagement.getExtensions()
   34 |   const colorThemePath = await getColorThemePath(extensions, colorThemeId)
   35 |   if (!colorThemePath) {`,
-    message: 'Failed to apply color theme "undefined": expected value to be of type string',
+    message: 'VError: Failed to apply color theme "undefined": expected value to be of type string',
     stack: `    at ExtensionHost.getColorThemeJson (file:///test/packages/shared-process/src/parts/ExtensionManagement/ExtensionManagementColorTheme.js:32:10)
     at executeCommandAsync (file:///test/packages/shared-process/src/parts/Command/Command.js:68:33)
     at async getResponse (file:///test/packages/shared-process/src/parts/GetResponse/GetResponse.js:21:9)
@@ -563,7 +584,7 @@ export const hydrate = async () => {
   83 |     state.colorTheme = colorThemeId
   84 |     const colorThemeJson = await getColorThemeJson(colorThemeId)
   85 |     const colorThemeCss = await getColorThemeCss(colorThemeId, colorThemeJson)`,
-    message: 'Failed to apply color theme "undefined": AssertionError: expected value to be of type string',
+    message: 'VError: Failed to apply color theme "undefined": AssertionError: expected value to be of type string',
     stack: `    at applyColorTheme (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:82:12)
     at hydrate (http://localhost:3000/packages/renderer-worker/src/parts/ColorTheme/ColorTheme.js:123:11)
     at startup (http://localhost:3000/packages/renderer-worker/src/parts/Workbench/Workbench.js:73:20)
@@ -685,7 +706,7 @@ export const insertLineBreak = async (editor) => {
   25 | }
   26 |
   27 | const getChanges = (lines, selections, languageConfiguration) => {`,
-    message: 'increaseIndentRegex.text is not a function',
+    message: 'TypeError: increaseIndentRegex.text is not a function',
     stack: `    at shouldIncreaseIndent (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:24:30)
     at getChanges (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:53:11)
     at insertLineBreak (http://localhost:3000/packages/renderer-worker/src/parts/EditorCommand/EditorCommandInsertLineBreak.js:86:19)
@@ -795,7 +816,7 @@ export const handleMenuMouseOver = async (state, level, index) => {
   10 |   const { menus } = state
   11 |   const menu = menus[level]
   12 |   const { items, focusedIndex, y, x } = menu`,
-    message: 'expected value to be of type number',
+    message: 'AssertionError: expected value to be of type number',
     stack: `    at handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleMenuMouseOver.js:9:10)
     at TitleBarMenuBar/lazy/handleMenuMouseOver (http://localhost:3000/packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:108:30)
     at async handleMessageFromRendererProcess (http://localhost:3000/packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
@@ -843,7 +864,7 @@ export const test = async ({ Locator, expect }) => {
      |   ^
   14 | }
   15 |`,
-    message: 'expected selector to be visible .DialogContent >> .DialogInfoIcoan',
+    message: 'AssertionError: expected selector to be visible .DialogContent >> .DialogInfoIcoan',
     stack: `    at Expect.checkSingleElementCondition (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:2391:13)
     at async test (about.open.ts:13:3)
     at async callFunction (http://localhost:3000/packages/test-worker/dist/testWorkerMain.js:6318:5)`,
@@ -1236,7 +1257,7 @@ export const setBounds = (id, left, top, width, height) => {
   24 |   if (module.attachEvents) {
   25 |     module.attachEvents(instanceState)
   26 |   }`,
-    message: "Cannot read properties of undefined (reading 'create')",
+    message: "TypeError: Cannot read properties of undefined (reading 'create')",
     stack: `    at create (http://localhost:3000/packages/renderer-process/src/parts/Viewlet/Viewlet.js:23:32)
     at Viewlet.sendMultiple (http://localhost:3000/packages/renderer-process/src/parts/Viewlet/Viewlet.js:132:9)
     at execute (http://localhost:3000/packages/renderer-process/src/parts/Command/Command.js:78:35)
@@ -1303,7 +1324,7 @@ export const parse = (content) => {
   16 |   } catch (error) {
   17 |     throw new VError(error, 'failed to parse json')
   18 |   }`,
-    message: 'VError: failed to parse json: SyntaxError: Unexpected token \'o\', "[object Blob]" is not valid JSON',
+    message: 'Error: VError: failed to parse json: SyntaxError: Unexpected token \'o\', "[object Blob]" is not valid JSON',
     stack: `    at JSON.parse (<anonymous>)
     at parse (/test/packages/renderer-worker/src/parts/Json/Json.js:15:17)
     at WebSocket.handleMessage (/test/packages/renderer-worker/src/parts/IpcParentWithWebSocket/IpcParentWithWebSocket.js:31:34)`,
@@ -1364,7 +1385,7 @@ const constructError = (message, type, name) => {
   16 |     if (name && name !== 'VError') {
   17 |       error.name = name
   18 |     }`,
-    message: "VError: Bulk replacement failed: File not found: './test.txt'",
+    message: "Error: VError: Bulk replacement failed: File not found: './test.txt'",
     stack: `    at constructError (http://localhost:3000/packages/renderer-worker/src/parts/RestoreJsonRpcError/RestoreJsonRpcError.js:15:19)
     at async invoke (http://localhost:3000/packages/renderer-worker/src/parts/SharedProcess/SharedProcess.js:45:18)
     at async applyBulkReplacement (http://localhost:3000/packages/renderer-worker/src/parts/BulkReplacement/BulkReplacement.js:8:3)
@@ -1404,7 +1425,7 @@ VError: Failed to execute command: command xyz.sampleCommand not found
   expect(prettyError).toEqual({
     _error: expect.anything(),
     codeFrame: '',
-    message: 'Failed to execute command: command xyz.sampleCommand not found',
+    message: 'Error: Failed to execute command: command xyz.sampleCommand not found',
     stack: `    at executeCommand (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:711:13)
     at execute (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1993:10)
     at handleJsonRpcMessage (http://localhost:3000/remote/test/dist/extensionHostWorkerMain.js:1939:30)
