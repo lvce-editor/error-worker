@@ -28,12 +28,13 @@ const prepareErrorMessageWithCodeFrame = (error: any) => {
   const lines = CleanStack.cleanStack(error.stack)
   const relevantStack = JoinLines.joinLines(lines)
   if (error.codeFrame) {
+    const type = error.constructor.name
     return {
       _error: error,
       codeFrame: error.codeFrame,
-      message,
+      message: formatMessageWithType(type, message),
       stack: relevantStack,
-      type: error.constructor.name,
+      type,
     }
   }
   return {
@@ -67,6 +68,14 @@ const getType = (error: any): string => {
     return 'Error'
   }
   return constructorName
+}
+
+const formatMessageWithType = (type: string, message: string): string => {
+  const prefix = `${type}: `
+  if (message.startsWith(prefix)) {
+    return message
+  }
+  return `${prefix}${message}`
 }
 
 const getIgnoredCodeFrameStackLines = (options: PrepareOptions): readonly string[] => {
@@ -111,12 +120,13 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
           line: originalLine,
         },
       })
+      const type = error.constructor.name
       return {
         _error: error,
         codeFrame,
-        message,
+        message: formatMessageWithType(type, message),
         stack: relevantStack,
-        type: error.constructor.name,
+        type,
       }
     }
     const codeFrame = CodeFrameColumns.create(text, {
@@ -129,12 +139,13 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
         line: parsedLine,
       },
     })
+    const type = getType(error)
     return {
       _error: error,
       codeFrame,
-      message,
+      message: formatMessageWithType(type, message),
       stack: relevantStack,
-      type: getType(error),
+      type,
     }
   } catch (otherError) {
     Logger.warn(`ErrorHandling Error: ${otherError}`)
@@ -163,7 +174,7 @@ export const print = (error: any, prefix = '') => {
     return
   }
   if (error && error.type && error.message && error.codeFrame) {
-    Logger.error(`${prefix}${error.type}: ${error.message}\n\n${error.codeFrame}\n\n${error.stack}`)
+    Logger.error(`${prefix}${formatMessageWithType(error.type, error.message)}\n\n${error.codeFrame}\n\n${error.stack}`)
     return
   }
   if (error && error.message && error.codeFrame) {
@@ -171,7 +182,7 @@ export const print = (error: any, prefix = '') => {
     return
   }
   if (error && error.type && error.message) {
-    Logger.error(`${prefix}${error.type}: ${error.message}\n${error.stack}`)
+    Logger.error(`${prefix}${formatMessageWithType(error.type, error.message)}\n${error.stack}`)
     return
   }
   if (error && error.stack) {
@@ -187,10 +198,10 @@ export const print = (error: any, prefix = '') => {
 
 export const getMessage = (error: any) => {
   if (error && error.type && error.message) {
-    return `${error.type}: ${error.message}`
+    return formatMessageWithType(error.type, error.message)
   }
   if (error && error.message) {
-    return `${error.constructor.name}: ${error.message}`
+    return formatMessageWithType(error.constructor.name, error.message)
   }
   return `Error: ${error}`
 }
