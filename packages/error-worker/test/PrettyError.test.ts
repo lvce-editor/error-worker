@@ -1,4 +1,5 @@
 /* eslint-disable @cspell/spellchecker */
+/* eslint-disable unicorn/no-error-property-assignment */
 import { beforeEach, expect, jest, test } from '@jest/globals'
 import { AssertionError } from '../src/parts/AssertionError/AssertionError.ts'
 import { VError } from '../src/parts/VError/VError.ts'

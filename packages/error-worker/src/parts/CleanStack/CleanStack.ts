@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable sonarjs/super-linear-regex */
 import * as Assert from '../Assert/Assert.ts'
 import * as SplitLines from '../SplitLines/SplitLines.ts'
 
