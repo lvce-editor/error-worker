@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/super-linear-regex */
 const RE_LINE_COLUMN = /(.*)(?:\(\d+:\d+\))/
 
 const getBabelErrorMessage = (message: string): string => {

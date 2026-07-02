@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/super-linear-regex */
 import * as Ajax from '../Ajax/Ajax.ts'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as CodeFrameColumns from '../CodeFrameColumns/CodeFrameColumns.ts'
