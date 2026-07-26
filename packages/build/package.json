@@ -7,6 +7,9 @@
   "author": "",
   "license": "MIT",
   "description": "",
+  "scripts": {
+    "build:watch": "esbuild --format=esm --bundle --external:node:buffer --external:electron --external:ws --external:node:worker_threads --watch ../error-worker/src/errorWorkerMain.ts --outfile=../../.tmp/dist/dist/errorWorkerMain.js"
+  },
   "devDependencies": {
     "@babel/preset-typescript": "^7.29.7",
     "@lvce-editor/verror": "^1.7.0",
