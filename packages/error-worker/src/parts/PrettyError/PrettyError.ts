@@ -2,12 +2,13 @@
 import * as Ajax from '../Ajax/Ajax.ts'
 import * as CleanStack from '../CleanStack/CleanStack.ts'
 import * as CodeFrameColumns from '../CodeFrameColumns/CodeFrameColumns.ts'
+import * as FormatStack from '../FormatStack/FormatStack.ts'
 import { getErrorMessage } from '../GetErrorMessage/GetErrorMessage.ts'
 import { getFile } from '../GetFile/GetFile.ts'
 import * as GetSourceMapMatch from '../GetSourceMapMatch/GetSourceMapMatch.ts'
 import * as IsActualSourceFile from '../IsActualSourceFile/IsActualSourceFile.ts'
 import * as IsFirefox from '../IsFirefox/IsFirefox.ts'
-import * as JoinLines from '../JoinLines/JoinLines.ts'
+import * as Location from '../Location/Location.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as SourceMap from '../SourceMap/SourceMap.ts'
 
@@ -27,7 +28,7 @@ const prepareErrorMessageWithCodeFrame = (error: any) => {
   }
   const message = getErrorMessage(error)
   const lines = CleanStack.cleanStack(error.stack)
-  const relevantStack = JoinLines.joinLines(lines)
+  const relevantStack = FormatStack.formatStack(lines, Location.getOrigin())
   if (error.codeFrame) {
     const type = error.constructor.name
     return {
@@ -103,7 +104,7 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
     const parsedLine = Number.parseInt(line)
     const parsedColumn = Number.parseInt(column)
     const message = getErrorMessage(error)
-    const relevantStack = JoinLines.joinLines(lines)
+    const relevantStack = FormatStack.formatStack(lines, Location.getOrigin())
     if (sourceMapMatch) {
       const sourceMapUrl = sourceMapMatch[1]
       const sourceMapAbsolutePath = getSourceMapAbsolutePath(path, sourceMapUrl)
