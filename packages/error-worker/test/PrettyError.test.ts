@@ -1,6 +1,7 @@
 /* eslint-disable @cspell/spellchecker */
 /* eslint-disable unicorn/no-error-property-assignment */
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import { AssertionError } from '../src/parts/AssertionError/AssertionError.ts'
 import { VError } from '../src/parts/VError/VError.ts'
 
@@ -34,10 +35,17 @@ jest.unstable_mockModule('../src/parts/SourceMap/SourceMap.ts', () => {
   }
 })
 
+jest.unstable_mockModule('../src/parts/SyntaxHighlightingWorker/SyntaxHighlightingWorker.ts', () => {
+  return {
+    invoke: jest.fn(),
+  }
+})
+
 const PrettyError = await import('../src/parts/PrettyError/PrettyError.ts')
 const Ajax = await import('../src/parts/Ajax/Ajax.ts')
 const SourceMap = await import('../src/parts/SourceMap/SourceMap.ts')
 const Logger = await import('../src/parts/Logger/Logger.ts')
+const SyntaxHighlightingWorker = await import('../src/parts/SyntaxHighlightingWorker/SyntaxHighlightingWorker.ts')
 
 test('print - prepared message with type', () => {
   PrettyError.print({
@@ -57,6 +65,73 @@ test('getMessage - prepared message with type', () => {
       type: 'TypeError',
     }),
   ).toBe('TypeError: x is not a function')
+})
+
+test('prepare - syntax highlighted code frame', async () => {
+  // @ts-ignore
+  SyntaxHighlightingWorker.invoke.mockResolvedValue([['const', 'Token Keyword', ' value = 1', 'Token Text']])
+  const error = new Error('Oops')
+  // @ts-ignore
+  error.codeFrame = 'const value = 1'
+
+  const prettyError = await PrettyError.prepare(error, { tokenizerPath: '/tokenize-javascript.js' })
+
+  expect(SyntaxHighlightingWorker.invoke).toHaveBeenCalledWith(
+    'Tokenizer.tokenizeCodeBlock',
+    'const value = 1',
+    'javascript',
+    '/tokenize-javascript.js',
+  )
+  expect(prettyError.syntaxHighlightedCodeFrame).toEqual([
+    {
+      childCount: 1,
+      className: 'SyntaxHighlightedCodeFrame',
+      type: VirtualDomElements.Pre,
+    },
+    {
+      childCount: 2,
+      className: 'SyntaxHighlightedCodeFrameLine',
+      type: VirtualDomElements.Span,
+    },
+    {
+      childCount: 1,
+      className: 'Token Keyword',
+      type: VirtualDomElements.Span,
+    },
+    {
+      childCount: 0,
+      text: 'const',
+      type: VirtualDomElements.Text,
+    },
+    {
+      childCount: 1,
+      className: 'Token Text',
+      type: VirtualDomElements.Span,
+    },
+    {
+      childCount: 0,
+      text: ' value = 1',
+      type: VirtualDomElements.Text,
+    },
+  ])
+})
+
+test('prepare - returns the pretty error when syntax highlighting fails', async () => {
+  // @ts-ignore
+  SyntaxHighlightingWorker.invoke.mockRejectedValue(new Error('Tokenizer failed'))
+  const error = new Error('Oops')
+  // @ts-ignore
+  error.codeFrame = 'const value = 1'
+
+  const prettyError = await PrettyError.prepare(error, { tokenizerPath: '/tokenize-javascript.js' })
+
+  expect(prettyError).toMatchObject({
+    codeFrame: 'const value = 1',
+    message: 'Error: Oops',
+    type: 'Error',
+  })
+  expect(prettyError.syntaxHighlightedCodeFrame).toBeUndefined()
+  expect(Logger.warn).toHaveBeenCalledWith('Failed to syntax highlight code frame: Error: Tokenizer failed')
 })
 
 test('prepare - fetch codeFrame', async () => {

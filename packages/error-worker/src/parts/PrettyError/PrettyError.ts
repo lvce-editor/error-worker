@@ -10,9 +10,22 @@ import * as IsFirefox from '../IsFirefox/IsFirefox.ts'
 import * as JoinLines from '../JoinLines/JoinLines.ts'
 import * as Logger from '../Logger/Logger.ts'
 import * as SourceMap from '../SourceMap/SourceMap.ts'
+import * as SyntaxHighlightCodeFrame from '../SyntaxHighlightCodeFrame/SyntaxHighlightCodeFrame.ts'
 
 export interface PrepareOptions {
   readonly ignoredCodeFrameStackLines?: readonly string[]
+  readonly tokenizerPath?: string
+}
+
+const addSyntaxHighlightedCodeFrame = async (prettyError: any, options: PrepareOptions): Promise<any> => {
+  const syntaxHighlightedCodeFrame = await SyntaxHighlightCodeFrame.syntaxHighlightCodeFrame(prettyError?.codeFrame, options.tokenizerPath)
+  if (!syntaxHighlightedCodeFrame) {
+    return prettyError
+  }
+  return {
+    ...prettyError,
+    syntaxHighlightedCodeFrame,
+  }
 }
 
 const prepareErrorMessageWithCodeFrame = (error: any) => {
@@ -156,10 +169,12 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
 
 export const prepare = async (error: any, options: PrepareOptions = {}) => {
   if (error && error.message && error.codeFrame) {
-    return prepareErrorMessageWithCodeFrame(error)
+    const prettyError = prepareErrorMessageWithCodeFrame(error)
+    return addSyntaxHighlightedCodeFrame(prettyError, options)
   }
   if (error && error.stack) {
-    return prepareErrorMessageWithoutCodeFrame(error, options)
+    const prettyError = await prepareErrorMessageWithoutCodeFrame(error, options)
+    return addSyntaxHighlightedCodeFrame(prettyError, options)
   }
   return error
 }
