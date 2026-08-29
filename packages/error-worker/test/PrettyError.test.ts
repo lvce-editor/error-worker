@@ -1,6 +1,7 @@
 /* eslint-disable @cspell/spellchecker */
 /* eslint-disable unicorn/no-error-property-assignment */
 import { beforeEach, expect, jest, test } from '@jest/globals'
+import { SyntaxHighlightingWorker } from '@lvce-editor/rpc-registry'
 import { VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import { AssertionError } from '../src/parts/AssertionError/AssertionError.ts'
 import { VError } from '../src/parts/VError/VError.ts'
@@ -35,17 +36,10 @@ jest.unstable_mockModule('../src/parts/SourceMap/SourceMap.ts', () => {
   }
 })
 
-jest.unstable_mockModule('../src/parts/SyntaxHighlightingWorker/SyntaxHighlightingWorker.ts', () => {
-  return {
-    invoke: jest.fn(),
-  }
-})
-
 const PrettyError = await import('../src/parts/PrettyError/PrettyError.ts')
 const Ajax = await import('../src/parts/Ajax/Ajax.ts')
 const SourceMap = await import('../src/parts/SourceMap/SourceMap.ts')
 const Logger = await import('../src/parts/Logger/Logger.ts')
-const SyntaxHighlightingWorker = await import('../src/parts/SyntaxHighlightingWorker/SyntaxHighlightingWorker.ts')
 
 test('print - prepared message with type', () => {
   PrettyError.print({
@@ -68,20 +62,18 @@ test('getMessage - prepared message with type', () => {
 })
 
 test('prepare - syntax highlighted code frame', async () => {
-  // @ts-ignore
-  SyntaxHighlightingWorker.invoke.mockResolvedValue([['const', 'Token Keyword', ' value = 1', 'Token Text']])
+  using mockRpc = SyntaxHighlightingWorker.registerMockRpc({
+    'Tokenizer.tokenizeCodeBlock'() {
+      return [['const', 'Token Keyword', ' value = 1', 'Token Text']]
+    },
+  })
   const error = new Error('Oops')
   // @ts-ignore
   error.codeFrame = 'const value = 1'
 
   const prettyError = await PrettyError.prepare(error, { tokenizerPath: '/tokenize-javascript.js' })
 
-  expect(SyntaxHighlightingWorker.invoke).toHaveBeenCalledWith(
-    'Tokenizer.tokenizeCodeBlock',
-    'const value = 1',
-    'javascript',
-    '/tokenize-javascript.js',
-  )
+  expect(mockRpc.invocations).toEqual([['Tokenizer.tokenizeCodeBlock', 'const value = 1', 'javascript', '/tokenize-javascript.js']])
   expect(prettyError.syntaxHighlightedCodeFrame).toEqual([
     {
       childCount: 1,
@@ -117,8 +109,11 @@ test('prepare - syntax highlighted code frame', async () => {
 })
 
 test('prepare - returns the pretty error when syntax highlighting fails', async () => {
-  // @ts-ignore
-  SyntaxHighlightingWorker.invoke.mockRejectedValue(new Error('Tokenizer failed'))
+  using mockRpc = SyntaxHighlightingWorker.registerMockRpc({
+    'Tokenizer.tokenizeCodeBlock'() {
+      throw new Error('Tokenizer failed')
+    },
+  })
   const error = new Error('Oops')
   // @ts-ignore
   error.codeFrame = 'const value = 1'
@@ -132,6 +127,7 @@ test('prepare - returns the pretty error when syntax highlighting fails', async 
   })
   expect(prettyError.syntaxHighlightedCodeFrame).toBeUndefined()
   expect(Logger.warn).toHaveBeenCalledWith('Failed to syntax highlight code frame: Error: Tokenizer failed')
+  expect(mockRpc.invocations).toEqual([['Tokenizer.tokenizeCodeBlock', 'const value = 1', 'javascript', '/tokenize-javascript.js']])
 })
 
 test('prepare - fetch codeFrame', async () => {
