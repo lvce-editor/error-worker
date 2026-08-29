@@ -1,7 +1,7 @@
 import type { VirtualDomNode } from '@lvce-editor/virtual-dom-worker'
+import { SyntaxHighlightingWorker } from '@lvce-editor/rpc-registry'
 import * as GetSyntaxHighlightedCodeFrame from '../GetSyntaxHighlightedCodeFrame/GetSyntaxHighlightedCodeFrame.ts'
 import * as Logger from '../Logger/Logger.ts'
-import * as SyntaxHighlightingWorker from '../SyntaxHighlightingWorker/SyntaxHighlightingWorker.ts'
 
 export const syntaxHighlightCodeFrame = async (codeFrame: unknown, tokenizerPath: unknown): Promise<readonly VirtualDomNode[] | undefined> => {
   if (typeof codeFrame !== 'string' || !codeFrame || typeof tokenizerPath !== 'string' || !tokenizerPath) {
