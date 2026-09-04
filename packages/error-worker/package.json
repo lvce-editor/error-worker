@@ -50,7 +50,7 @@
     "@lvce-editor/i18n": "^2.10.0",
     "@lvce-editor/list": "^1.16.0",
     "@lvce-editor/rpc": "^6.19.3",
-    "@lvce-editor/rpc-registry": "^9.55.0",
+    "@lvce-editor/rpc-registry": "^9.56.0",
     "@lvce-editor/verror": "^1.7.0",
     "@lvce-editor/virtual-dom-worker": "^11.16.2",
     "jest": "^30.5.0",
