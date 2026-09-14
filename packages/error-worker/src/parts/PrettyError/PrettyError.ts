@@ -43,7 +43,7 @@ const prepareErrorMessageWithCodeFrame = (error: any) => {
   const lines = CleanStack.cleanStack(error.stack)
   const relevantStack = FormatStack.formatStack(lines, Location.getOrigin())
   if (error.codeFrame) {
-    const type = error.constructor.name
+    const type = getType(error)
     return {
       _error: error,
       codeFrame: error.codeFrame,
@@ -78,11 +78,18 @@ const toAbsoluteUrl = (file: string, relativePath: string) => {
 }
 
 const getType = (error: any): string => {
-  const constructorName = error.constructor.name
+  const constructorName = error?.constructor?.name
+  if (constructorName === 'DOMException') {
+    return constructorName
+  }
+  const name = error?.name
+  if (name && name !== 'Error') {
+    return name
+  }
   if (constructorName === 'Object') {
     return 'Error'
   }
-  return constructorName
+  return constructorName || 'Error'
 }
 
 const formatMessageWithType = (type: string, message: string): string => {
@@ -135,7 +142,7 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
           line: originalLine,
         },
       })
-      const type = error.constructor.name
+      const type = getType(error)
       return {
         _error: error,
         codeFrame,
