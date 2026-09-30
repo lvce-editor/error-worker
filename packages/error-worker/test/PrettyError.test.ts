@@ -1341,6 +1341,21 @@ export const setBounds = (id, left, top, width, height) => {
   })
 })
 
+test('prepare uses provided source text for file URL stack frames', async () => {
+  const error = new SyntaxError('Unexpected token')
+  error.stack = `SyntaxError: Unexpected token\n    at parse (file:///usr/lib/lvce/extensions/devcontainerProcess.js:2:7)`
+  const sourceText = 'const value = 1\nconst = 2\n'
+
+  const prettyError = await PrettyError.prepare(error, {
+    sourceText,
+    sourceUrl: 'file:///usr/lib/lvce/extensions/devcontainerProcess.js',
+  })
+
+  expect(prettyError.codeFrame).toContain('const = 2')
+  expect(prettyError.codeFrame).toContain('^')
+  expect(Ajax.getText).not.toHaveBeenCalled()
+})
+
 test('prepare - bad stack trace', async () => {
   const error = new TypeError('importFn is not a function')
   error.stack = `TypeError: importFn is not a function

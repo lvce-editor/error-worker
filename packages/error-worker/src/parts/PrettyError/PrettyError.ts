@@ -15,6 +15,8 @@ import * as SyntaxHighlightCodeFrame from '../SyntaxHighlightCodeFrame/SyntaxHig
 
 export interface PrepareOptions {
   readonly ignoredCodeFrameStackLines?: readonly string[]
+  readonly sourceText?: string
+  readonly sourceUrl?: string
   readonly tokenizerPath?: string
 }
 
@@ -116,11 +118,12 @@ const prepareErrorMessageWithoutCodeFrame = async (error: any, options: PrepareO
       return error
     }
     const [_, path, line, column] = match
-    if (!IsActualSourceFile.isActualSourceFile(path)) {
+    const hasSourceText = path === options.sourceUrl && options.sourceText !== undefined
+    if (!hasSourceText && !IsActualSourceFile.isActualSourceFile(path)) {
       return error
     }
-    const text = await Ajax.getText(path)
-    const sourceMapMatch = GetSourceMapMatch.getSourceMapMatch(text)
+    const text = hasSourceText ? options.sourceText : await Ajax.getText(path)
+    const sourceMapMatch = hasSourceText ? undefined : GetSourceMapMatch.getSourceMapMatch(text)
     const parsedLine = Number.parseInt(line)
     const parsedColumn = Number.parseInt(column)
     const message = getErrorMessage(error)
