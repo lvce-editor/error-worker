@@ -1,39 +1,32 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
-const __dirname = import.meta.dirname
-
-const root = join(__dirname, '..', '..', '..')
-
-export const getRemoteUrl = (path) => {
-  const url = pathToFileURL(path).toString().slice(8)
-  return `/remote/${url}`
+const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
+const staticPath = join(root, 'node_modules', '@lvce-editor', 'static-server', 'static')
+const commitHash = (await readdir(staticPath)).find((name) => /^[a-z\d]{7}$/.test(name))
+if (!commitHash) {
+  throw new Error('Server static commit not found')
 }
-
-const nodeModulesPath = join(root, 'node_modules')
-
+const rendererPath = join(staticPath, commitHash, 'packages', 'renderer-worker', 'dist')
 const workerPath = join(root, '.tmp', 'dist', 'dist', 'errorWorkerMain.js')
-
-const serverStaticPath = join(nodeModulesPath, '@lvce-editor', 'static-server', 'static')
-
-const RE_COMMIT_HASH = /^[a-z\d]+$/
-const isCommitHash = (dirent) => {
-  return dirent.length === 7 && dirent.match(RE_COMMIT_HASH)
+const workerUrl = `/remote/${pathToFileURL(workerPath).pathname.slice(1)}`
+const occurrence = '`${assetDir}/packages/renderer-worker/node_modules/@lvce-editor/error-worker/dist/errorWorkerMain.js`'
+const replacement = JSON.stringify(workerUrl)
+let found = false
+for (const name of await readdir(rendererPath)) {
+  if (!name.endsWith('.js')) {
+    continue
+  }
+  const path = join(rendererPath, name)
+  const content = await readFile(path, 'utf8')
+  if (content.includes(occurrence)) {
+    await writeFile(path, content.replaceAll(occurrence, replacement))
+    found = true
+  } else if (content.includes(replacement)) {
+    found = true
+  }
 }
-
-const dirents = await readdir(serverStaticPath)
-const commitHash = dirents.find(isCommitHash) || ''
-const rendererWorkerMainPath = join(serverStaticPath, commitHash, 'packages', 'renderer-worker', 'dist', 'rendererWorkerMain.js')
-
-const content = await readFile(rendererWorkerMainPath, 'utf-8')
-
-const remoteUrl = getRemoteUrl(workerPath)
-if (!content.includes('// const errorWorkerUrl = ')) {
-  const occurrence = `const errorWorkerUrl = \`\${assetDir}/packages/error-worker/dist/errorWorkerMain.js\``
-  const replacement = `// const errorWorkerUrl = \`\${assetDir}/packages/error-worker/dist/errorWorkerMain.js\`
-const errorWorkerUrl = \`${remoteUrl}\``
-
-  const newContent = content.replace(occurrence, replacement)
-  await writeFile(rendererWorkerMainPath, newContent)
+if (!found) {
+  throw new Error('Error worker URL not found')
 }
