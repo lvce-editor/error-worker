@@ -6,6 +6,7 @@ export const test: Test = async ({ expect, FileSystem, Locator, Search, SideBar,
   // arrange
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/test.css`, `abc`)
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- Keep using the temporary directory path for this search regression test.
   await Workspace.setPath(tmpDir)
   await SideBar.open('Search')
   await Search.setValue('ab')
