@@ -1,6 +1,13 @@
 import { expect, test } from '@jest/globals'
 import { cleanStack } from '../src/parts/CleanStack/CleanStack.ts'
 
+test('formats Firefox stack frames', () => {
+  expect(cleanStack(`TypeError: failed\nfn@http://localhost/app.js:4:27\n@http://localhost/app.js:8:2`)).toEqual([
+    '  at fn (http://localhost/app.js:4:27)',
+    '  at (http://localhost/app.js:8:2)',
+  ])
+})
+
 test('removes node internal stack', () => {
   const stack = `errorWorkerMain.js:2015 Error: Utility process exited before ipc connection was established: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'extract-zip' imported from C:\Users\simon\AppData\Local\Programs\lvce\resources\app\packages\shared-process\node_modules\@lvce-editor\ripgrep\src\downloadRipGrep.js
     at Object.create$6 [as create] (file:///C:/Users/test/AppData/Local/Programs/lvce/resources/app/packages/main-process/dist/mainProcessMain.js:2429:11)
