@@ -11,6 +11,7 @@ const RE_ASYNC_OBJECT = /^\s*at async Object\.(\w+)/
 const RE_PATH_1 = /\((.*):(\d+):(\d+)\)$/
 const RE_PATH_2 = /at (.*):(\d+):(\d+)$/
 const RE_PATH_3 = /@(.*):(\d+):(\d+)$/ // Firefox
+const RE_FIREFOX_FRAME = /^.*@.*:\d+:\d+$/
 const RE_RESTORE_JSON_RPC_ERROR = /^\s*at restoreJsonRpcError/
 const RE_UNWRAP_JSON_RPC_RESULT = /^\s*at unwrapJsonRpcResult/
 const RE_GET_RESPONSE = /^\s*at getResponse/
@@ -46,6 +47,12 @@ const isApplicationUsefulLine = (line, index) => {
 }
 
 const cleanLine = (line) => {
+  if (RE_FIREFOX_FRAME.test(line)) {
+    const separatorIndex = line.indexOf('@')
+    const functionName = line.slice(0, separatorIndex)
+    const frame = line.slice(separatorIndex + 1)
+    return functionName ? `  at ${functionName} (${frame})` : `  at (${frame})`
+  }
   if (line.startsWith('    at async Module.')) {
     return '    at async ' + line.slice('    at async Module.'.length)
   }

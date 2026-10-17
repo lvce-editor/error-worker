@@ -318,11 +318,11 @@ handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/Rend
   6 |     ...menus.slice(0, -1),
   7 |     {`,
     message: 'ReferenceError: Menu is not defined',
-    stack: `handleKeyArrowDownMenuOpen@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27
-ifElseFunction@test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14
-TitleBarMenuBar/lazy/handleKeyArrowDown@test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30
-Object.handleKeyBinding@test:///packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3
-handleMessageFromRendererProcess@test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3`,
+    stack: `  at handleKeyArrowDownMenuOpen (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarHandleKeyArrowDownMenuOpen.js:4:27)
+  at ifElseFunction (test:///packages/renderer-worker/src/parts/ViewletTitleBarMenuBar/ViewletTitleBarMenuBarIfElse.js:5:14)
+  at TitleBarMenuBar/lazy/handleKeyArrowDown (test:///packages/renderer-worker/src/parts/ViewletManager/ViewletManager.js:115:30)
+  at Object.handleKeyBinding (test:///packages/renderer-worker/src/parts/KeyBindings/KeyBindings.js:36:3)
+  at handleMessageFromRendererProcess (test:///packages/renderer-worker/src/parts/RendererProcess/RendererProcess.js:45:3)`,
     type: 'ReferenceError',
   })
 })
